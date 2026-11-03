@@ -119,16 +119,18 @@ export function Provider({ children }) {
 
   const active = alerts.filter((a) => !state.dismissed.includes(a.id));
 
-  const notified = useRef(new Set());
+  const notified = useRef(new Set(JSON.parse(localStorage.getItem('arcticflow.sent') || '[]')));
   useEffect(() => {
     const topic = state.settings.ntfy;
     const browser = state.settings.notify && 'Notification' in window && Notification.permission === 'granted';
     active.forEach((a) => {
-      if (notified.current.has(a.id)) return;
-      notified.current.add(a.id);
-      if (browser) new Notification(`ArcticFlow: ${a.title}`, { body: a.text });
-      if (topic) fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, { method: 'POST', headers: { Title: `ArcticFlow: ${a.title}`.replace(/[^\x20-\x7e]+/g, '-'), Priority: a.sev === 'critical' ? 'high' : 'default', Tags: 'snowflake' }, body: a.text }).catch(() => {});
+      if (browser && !notified.current.has(`b:${a.id}`)) { notified.current.add(`b:${a.id}`); new Notification(`ArcticFlow: ${a.title}`, { body: a.text }); }
+      if (topic && !notified.current.has(`n:${topic}:${a.id}`)) {
+        notified.current.add(`n:${topic}:${a.id}`);
+        fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, { method: 'POST', headers: { Title: `ArcticFlow: ${a.title}`.replace(/[^\x20-\x7e]+/g, '-'), Priority: a.sev === 'critical' ? 'high' : 'default', Tags: 'snowflake' }, body: a.text }).catch(() => {});
+      }
     });
+    localStorage.setItem('arcticflow.sent', JSON.stringify([...notified.current].slice(-300)));
   }, [active, state.settings.notify, state.settings.ntfy]);
 
   const value = { state, dispatch, live, refresh, states, airInfo, alerts, active, nowMs, clock };
