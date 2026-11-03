@@ -5,7 +5,7 @@ import { SEED_PROPS, SEED_VEHICLES, seedTasks, seedLogs, syntheticWx } from './l
 import { nowAK, akMs, uid, fmtDate } from './lib/util';
 
 const KEY = 'arcticflow.v1';
-const DEFAULT_SETTINGS = { theme: 'dark', lowFuelPct: 40, leadDays: 3, stage1: 30, stage2: 35, notify: false, ghToken: '', gistId: '', homeId: 'p1' };
+const DEFAULT_SETTINGS = { theme: 'dark', lowFuelPct: 40, leadDays: 3, stage1: 30, stage2: 35, notify: false, ntfy: '', ghToken: '', gistId: '', homeId: 'p1' };
 
 function initial() {
   try {
@@ -121,9 +121,15 @@ export function Provider({ children }) {
 
   const notified = useRef(new Set());
   useEffect(() => {
-    if (!state.settings.notify || !('Notification' in window) || Notification.permission !== 'granted') return;
-    active.forEach((a) => { if (!notified.current.has(a.id)) { notified.current.add(a.id); new Notification(`ArcticFlow: ${a.title}`, { body: a.text }); } });
-  }, [active, state.settings.notify]);
+    const topic = state.settings.ntfy;
+    const browser = state.settings.notify && 'Notification' in window && Notification.permission === 'granted';
+    active.forEach((a) => {
+      if (notified.current.has(a.id)) return;
+      notified.current.add(a.id);
+      if (browser) new Notification(`ArcticFlow: ${a.title}`, { body: a.text });
+      if (topic) fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, { method: 'POST', headers: { Title: `ArcticFlow: ${a.title}`.replace(/[^\x20-\x7e]+/g, '-'), Priority: a.sev === 'critical' ? 'high' : 'default', Tags: 'snowflake' }, body: a.text }).catch(() => {});
+    });
+  }, [active, state.settings.notify, state.settings.ntfy]);
 
   const value = { state, dispatch, live, refresh, states, airInfo, alerts, active, nowMs, clock };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

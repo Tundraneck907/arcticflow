@@ -38,6 +38,11 @@ export default function Settings() {
           </div>
         </Card>
 
+        <Card title="Phone push alerts (free, ntfy.sh)" icon="alerts">
+          <p className="sm mu" style={{ marginTop: 0 }}>Install the free <b>ntfy</b> app, subscribe to a private topic name, and enter the same name here. New alerts (low fuel, deep cold, plug-in, air, NWS) are pushed to your phone while ArcticFlow is open in any tab. Anyone who knows the topic name can read it, so make it long and random.</p>
+          <Field label="ntfy topic"><input value={s.ntfy || ''} onChange={(e) => set({ ntfy: e.target.value.trim() })} placeholder="arcticflow-yourname-8472" /></Field>
+          <div className="row"><button className="btn" disabled={!s.ntfy} onClick={() => fetch(`https://ntfy.sh/${encodeURIComponent(s.ntfy)}`, { method: 'POST', headers: { Title: 'ArcticFlow test' }, body: 'Push alerts are working.' }).then((r) => setMsg(r.ok ? 'Test sent. Check your phone.' : 'ntfy rejected the request.')).catch(() => setMsg('Could not reach ntfy.sh.'))}>Send test</button></div>
+        </Card>
         <Card title="GitHub backup (free)" icon="github">
           <p className="sm mu" style={{ marginTop: 0 }}>Back up your logs to a <b>private GitHub Gist</b> using a personal access token with only the <code>gist</code> scope. The token stays in this browser's local storage and is never included in backups.</p>
           <div className="grid" style={{ gap: 10 }}>
