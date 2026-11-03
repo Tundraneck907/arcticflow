@@ -1,0 +1,20 @@
+{
+  "name": "arcticflow",
+  "description": "ArcticFlow — Interior Alaska fuel logging, weather, outage and winter-readiness app with live free APIs",
+  "type": "module",
+  "scripts": {
+    "build": "bunx --bun vite build",
+    "dev": "bunx --bun vite",
+    "start": "bun run build-if-needed.js && bun run serve.js"
+  },
+  "dependencies": {
+    "chart.js": "^4.6.1",
+    "leaflet": "^1.9.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  }
+}

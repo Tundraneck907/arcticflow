@@ -1,0 +1,12 @@
+import home from '../assets/home.jpg';
+import cabin from '../assets/cabin.jpg';
+import rental from '../assets/rental.jpg';
+import drycabin from '../assets/drycabin.jpg';
+import chalet from '../assets/chalet.jpg';
+import trailer from '../assets/trailer.jpg';
+import freeze from '../assets/freeze.jpg';
+import truck from '../assets/truck.jpg';
+import generator from '../assets/generator.jpg';
+import tank from '../assets/tank.jpg';
+import hero from '../assets/hero.jpg';
+export default { home, cabin, rental, drycabin, chalet, trailer, freeze, truck, generator, tank, hero };
