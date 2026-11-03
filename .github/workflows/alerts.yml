@@ -1,0 +1,21 @@
+name: Background alerts
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    env:
+      GIST_ID: ${{ secrets.GIST_ID }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+    steps:
+      - name: Check configuration
+        run: |
+          if [ -z "$GIST_ID" ] || [ -z "$NTFY_TOPIC" ]; then echo "GIST_ID / NTFY_TOPIC secrets not set; skipping."; echo "SKIP=1" >> "$GITHUB_ENV"; fi
+      - uses: actions/checkout@v4
+        if: env.SKIP != '1'
+      - uses: oven-sh/setup-bun@v2
+        if: env.SKIP != '1'
+      - run: bun scripts/alerts.mjs
+        if: env.SKIP != '1'
